@@ -1,5 +1,8 @@
 import express from "express";
 import { exec } from "child_process";
+import util from "util";
+
+const execAsync = util.promisify(exec);
 import dotenv from "dotenv";
 import { protectedRoute, generateToken } from "./middleware.js";
 import { Server } from "socket.io";
@@ -157,7 +160,17 @@ app.post("/build-project", protectedRoute, async (req, res) => {
     -e accessKeyId=${process.env.accessKeyId}\
     -e secretAccessKey=${process.env.secretAccessKey} build-server`;
 
-  exec(command);
+  try {
+    const { stdout, stderr } = await execAsync(command);
+    console.log("✅ Command executed successfully:");
+    console.log("stdout:", stdout);
+    if (stderr) console.warn("stderr:", stderr);
+  } catch (error) {
+    console.error("❌ Failed to execute command:");
+    console.error("error.message:", error.message);
+    console.error("stderr:", error.stderr);
+    console.error("stdout:", error.stdout);
+  }
 
   console.log(command);
 
