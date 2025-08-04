@@ -20,14 +20,14 @@ export const users = pgTable("users", {
 
 export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id")
+  user_id: integer("user_id")
     .notNull()
     .references(() => users.id, {
       onDelete: "cascade",
     }),
   slug: text("slug").notNull().unique(),
-  isPublic: boolean("is_public").notNull().default(false),
-  gitUrl: text("git_url"),
+  is_public: boolean("is_public").notNull().default(false),
+  git_url: text("git_url"),
   env: text("env"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
