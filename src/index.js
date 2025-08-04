@@ -172,8 +172,6 @@ app.post("/build-project", protectedRoute, async (req, res) => {
     console.error("stdout:", error.stdout);
   }
 
-  console.log(command);
-
   console.log(`projectSlug: ${projectSlug}`);
 
   return res.json({

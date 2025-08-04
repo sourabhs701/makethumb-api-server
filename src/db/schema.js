@@ -1,25 +1,33 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import {
+  pgTable,
+  serial,
+  integer,
+  text,
+  timestamp,
+  boolean,
+} from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
-export const users = sqliteTable("users", {
-  id: integer("id").primaryKey(),
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
   avatar: text("avatar"),
   username: text("username").notNull().unique(),
   email: text("email").unique(),
   name: text("name"),
-  twitter_username: text("twitter_username"),
-  created_at: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+  twitterUsername: text("twitter_username"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const projects = sqliteTable("projects", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-
-  user_id: integer("user_id").references(() => users.id, {
-    onDelete: "cascade",
-  }),
+export const projects = pgTable("projects", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, {
+      onDelete: "cascade",
+    }),
   slug: text("slug").notNull().unique(),
-  is_public: integer("is_public").default(0),
-  git_url: text("git_url"),
+  isPublic: boolean("is_public").notNull().default(false),
+  gitUrl: text("git_url"),
   env: text("env"),
-  created_at: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });

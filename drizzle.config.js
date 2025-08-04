@@ -4,9 +4,9 @@ export default defineConfig({
   schema: "./src/db/schema.js",
   out: "./src/db/migrations",
   dbCredentials: {
-    url: "file:./data/makethumb.db",
+    url: process.env.DATABASE_URL,
   },
-  dialect: "sqlite",
+  dialect: "postgresql",
   verbose: true,
   strict: true,
 });
