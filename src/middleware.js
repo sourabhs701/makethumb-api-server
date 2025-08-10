@@ -35,14 +35,8 @@ export const protectedRoute = (req, res, next) => {
   }
 };
 
-export const generateToken = (id) => {
-  return jwt.sign(
-    {
-      id: Number(id),
-    },
-    JWT_SECRET,
-    { expiresIn: "24h" }
-  );
+export const generateToken = (user) => {
+  return jwt.sign(user, JWT_SECRET, { expiresIn: "24h" });
 };
 
 export default protectedRoute;

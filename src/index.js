@@ -14,6 +14,8 @@ import axios from "axios";
 import cors from "cors";
 import { generateSlug } from "random-word-slugs";
 import { createServer } from "http";
+import { parse } from "./parse.js";
+import GithubRoutes from "./routes/github.js";
 dotenv.config();
 
 const app = express();
@@ -89,11 +91,12 @@ app.get("/auth/github", async (req, res) => {
       username: data.login,
       email: data.email,
       name: data.name,
+      github_token: accessToken,
       twitter_username: data.twitter_username,
       created_at: new Date().toISOString(),
     };
 
-    const token = generateToken(user.id);
+    const token = generateToken(user);
 
     const existingUser = await db
       .select()
@@ -108,8 +111,13 @@ app.get("/auth/github", async (req, res) => {
         email: user.email,
         name: user.name,
         twitter_username: user.twitter_username,
+        github_token: user.github_token,
       });
     }
+    await db
+      .update(users)
+      .set({ github_token: user.github_token })
+      .where(eq(users.id, user.id));
 
     const redirectUrl = `${process.env.FRONTEND_URL}/auth?token=${token}&avatar=${user.avatar}&username=${user.username}`;
     res.redirect(redirectUrl);
@@ -120,7 +128,9 @@ app.get("/auth/github", async (req, res) => {
 });
 
 app.post("/build-project", protectedRoute, async (req, res) => {
-  const { git_url, is_public, slug, env_vars } = req.body;
+  const { git_url, is_public, slug, env_vars, root_dir } = req.body;
+
+  console.log({ git_url, is_public, slug, env_vars, root_dir });
 
   if (!git_url) {
     return res.status(400).send("Fill all fields");
@@ -271,6 +281,10 @@ app.get("/api/check-slug", protectedRoute, async (req, res) => {
       .json({ error: "Failed to check slug availability", available: false });
   }
 });
+
+app.get("/parse", parse);
+
+app.use("/github", GithubRoutes);
 
 // app.use(express.static(path.join(__dirname, "./public")));
 

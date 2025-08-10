@@ -6,7 +6,6 @@ import {
   timestamp,
   boolean,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -15,6 +14,7 @@ export const users = pgTable("users", {
   email: text("email").unique(),
   name: text("name"),
   twitterUsername: text("twitter_username"),
+  github_token: text("github_token"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
